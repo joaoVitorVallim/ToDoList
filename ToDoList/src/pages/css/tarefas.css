@@ -1,0 +1,129 @@
+body {
+  background-color: #121212;
+  margin: 0;
+  font-family: sans-serif;
+  color: #fff;
+}
+
+.titulo {
+  text-align: center;
+  margin-top: 20px;
+}
+
+/* 🔥 Wrapper que permite que a scrollbar fique em cima */
+.scroll-wrapper {
+  position: relative;
+  padding-top: 20px; /* Espaço pra não encostar no header */
+}
+
+.scroll-wrapper::before {
+  content: "";
+  display: block;
+  height: 8px;
+  background-color: transparent;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  overflow-x: auto;
+  pointer-events: none;
+}
+
+.container-horizontal {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 10px;
+  scroll-behavior: smooth;
+}
+
+/* 🔥 Barra de rolagem no topo */
+.container-horizontal::-webkit-scrollbar {
+  height: 8px;
+  background: transparent;
+}
+
+.container-horizontal::-webkit-scrollbar-track {
+  background: #222;
+}
+
+.container-horizontal::-webkit-scrollbar-thumb {
+  background-color: #555;
+  border-radius: 4px;
+}
+
+.card {
+  min-width: 250px;
+  background-color: #1e1e1e;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.5);
+  flex-shrink: 0;
+}
+
+.card h2 {
+  margin-top: 0;
+}
+
+.card ul {
+  padding-left: 20px;
+}
+
+.card li {
+  margin-bottom: 8px;
+}
+
+.checkbox {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-size: 16px;
+  user-select: none;
+  gap: 8px;
+}
+
+/* Esconde o checkbox nativo */
+.checkbox input {
+  display: none;
+}
+
+/* Caixa do checkbox */
+.checkbox .checkmark {
+  width: 20px;
+  height: 20px;
+  background-color: #222;
+  border: 2px solid #4caf50; /* Cor da borda verde */
+  border-radius: 4px;
+  position: relative;
+  transition: background-color 0.2s;
+  padding: 2px;
+  margin: 8px 0;
+}
+
+/* Desenhar o check quando estiver marcado */
+.checkbox input:checked + .checkmark {
+  background-color: #4caf50;
+}
+
+.checkbox .checkmark::after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+.checkbox input:checked + .checkmark::after {
+  display: block;
+}
+
+.checkbox .checkmark::after {
+  content: "";
+  position: absolute;
+  top: 38%;
+  left: 50%;
+  width: 8px;
+  height: 12px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: translate(-50%, -50%) rotate(45deg);
+}
