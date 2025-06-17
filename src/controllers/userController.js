@@ -1,79 +1,115 @@
 const User = require('../models/userModel');
 const { formatUser } = require('../views/userView');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
-
-async function cadastro(req, res) {
-    try {
-        const { name, email, password } = req.body;
-        if (!name || !email || !password) {
-            return res.status(400).json({ 
-                error: "Todos os campos são obrigatórios: name, email e password" 
-            });
-        }
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
-            return res.status(400).json({ 
-                error: "Formato de email inválido" 
-            });
-        }
-        if (password.length < 6) {
-            return res.status(400).json({ 
-                error: "A senha deve ter pelo menos 6 caracteres" 
-            });
-        }
-        const existingUser = await User.findOne({ email });
-        if (existingUser) {
-            return res.status(400).json({ 
-                error: "Este email já está cadastrado" 
-            });
-        }
-        const salt = 12;
-        const passwordHash = await bcrypt.hash(password, salt);
-        const user = await User.create({ name, email, passwordHash });
-        return res.status(201).json(formatUser(user));
-    } catch (error) {
-        console.error('Erro no cadastro:', error);
-        return res.status(500).json({ 
-            error: "Erro interno do servidor ao cadastrar usuário" 
-        });
-    }
-}
-
-
-async function getUsers(req, res) {
-    try {
-        const users = await User.find();
-
-        if (!users || users.length === 0) {
-            return res.status(404).json({ message: "Nenhum usuário encontrado" });
-        }
-
-        res.status(200).json(users.map(formatUser));
-    } catch (error) {
-        res.status(500).json({ error: "Erro interno do servidor ao buscar usuários" });
-    }
-}
-
-
-async function deleteUser (req, res) {
+// Login
+const login = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { email, password } = req.body;
 
-    if (!id) {
-      return res.status(400).json({ error: "ID do usuário é obrigatório!" });
-    }
-
-    const user = await User.findByIdAndDelete(id);
-
+    // Busca o usuário
+    const user = await User.findOne({ email });
     if (!user) {
-      return res.status(404).json({ message: "Usuário não encontrado"});
+      return res.status(401).json({ message: 'Email ou senha inválidos' });
     }
 
-    res.json({message: "Usuário deletado com sucesso"});
-  } catch (error) {
-    res.status(500).json({error: error.message});
-  }
-}
+    // Verifica a senha
+    const isValidPassword = await bcrypt.compare(password, user.passwordHash);
+    if (!isValidPassword) {
+      return res.status(401).json({ message: 'Email ou senha inválidos' });
+    }
 
-module.exports = { getUsers, deleteUser, cadastro };
+    // Gera o token JWT
+    const token = jwt.sign(
+      { userId: user._id },
+      process.env.JWT_SECRET || 'sua_chave_secreta_jwt',
+      { expiresIn: '24h' }
+    );
+
+    res.json({
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Erro ao fazer login' });
+  }
+};
+
+// Cadastro
+const cadastro = async (req, res) => {
+  try {
+    const { name, email, password } = req.body;
+
+    // Verifica se o email já está em uso
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ message: 'Email já está em uso' });
+    }
+
+    // Cria hash da senha
+    const salt = await bcrypt.genSalt(10);
+    const passwordHash = await bcrypt.hash(password, salt);
+
+    // Cria o usuário
+    const user = await User.create({
+      name,
+      email,
+      passwordHash
+    });
+
+    // Gera o token JWT
+    const token = jwt.sign(
+      { userId: user._id },
+      process.env.JWT_SECRET || 'sua_chave_secreta_jwt',
+      { expiresIn: '24h' }
+    );
+
+    res.status(201).json({
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Erro ao criar usuário' });
+  }
+};
+
+// Buscar usuário atual
+const getCurrentUser = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id).select('-passwordHash');
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ message: 'Erro ao buscar usuário' });
+  }
+};
+
+// Listar todos os usuários
+const getUsers = async (req, res) => {
+  try {
+    const users = await User.find().select('-passwordHash');
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ message: 'Erro ao buscar usuários' });
+  }
+};
+
+// Deletar usuário
+const deleteUser = async (req, res) => {
+  try {
+    await User.findByIdAndDelete(req.params.id);
+    res.json({ message: 'Usuário deletado com sucesso' });
+  } catch (error) {
+    res.status(500).json({ message: 'Erro ao deletar usuário' });
+  }
+};
+
+module.exports = { getUsers, deleteUser, cadastro, login, getCurrentUser };
