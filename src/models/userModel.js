@@ -4,31 +4,11 @@ const { Schema } = mongoose;
 const taskSchema = new Schema({
     title: { type: String, required: true },
     description: { type: String, required: true },
-    completed: { type: Boolean, default: false },
-    createdAt: { type: Date, default: Date.now },
-    schedule: {
-        type: {
-            type: String,
-            enum: ['daily', 'weekly', 'biweekly', 'monthly', 'custom', 'specific'],
-            required: true
-        },
-        days: [{
-            type: Number,
-            min: 0,
-            max: 6
-        }],
-        dayOfMonth: {
-            type: Number,
-            min: 1,
-            max: 31
-        },
-        interval: { type: Number },
-        startDate: { type: Date },
-        endDate: { type: Date },
-        specificDate: { type: Date },
-        time: { type: String },
-        lastCompleted: { type: Date }
-    }
+    list_dates: [{ type: Date, required: true }],
+    completed: [{ type: Date, default: [] }],
+    time: { type: String, required: true }, // Format: HH:mm
+    lastCompleted: { type: Date, default: null },
+    createdAt: { type: Date, default: Date.now }
 });
 
 const userSchema = new Schema({

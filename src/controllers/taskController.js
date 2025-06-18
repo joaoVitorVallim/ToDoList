@@ -3,7 +3,7 @@ const User = require('../models/userModel');
 // Criar uma nova tarefa
 const createTask = async (req, res) => {
   try {
-    const { title, description, schedule } = req.body;
+    const { title, description, list_dates, time } = req.body;
     const userId = req.user._id;
 
     const user = await User.findById(userId);
@@ -14,12 +14,8 @@ const createTask = async (req, res) => {
     const newTask = {
       title,
       description,
-      completed: false,
-      createdAt: new Date(),
-      schedule: schedule || {
-        type: 'daily',
-        lastCompleted: null
-      }
+      list_dates,
+      time
     };
 
     user.tasks.push(newTask);
@@ -27,140 +23,21 @@ const createTask = async (req, res) => {
 
     res.status(201).json(newTask);
   } catch (error) {
-    res.status(500).json({ message: 'Erro ao criar tarefa' });
-  }
-};
-
-// Função auxiliar para verificar se uma tarefa deve aparecer em um dia específico
-const shouldTaskAppearOnDay = (task, targetDate) => {
-  const { schedule } = task;
-  if (!schedule) return true;
-
-  const targetDay = targetDate.getDay();
-  const targetDateOfMonth = targetDate.getDate();
-
-  switch (schedule.type) {
-    case 'daily':
-      return true;
-
-    case 'weekly':
-      return schedule.days.includes(targetDay);
-
-    case 'monthly':
-      return schedule.dayOfMonth === targetDateOfMonth;
-
-    case 'biweekly':
-      if (!schedule.lastCompleted) return true;
-      const daysSinceLast = Math.floor((targetDate - schedule.lastCompleted) / (1000 * 60 * 60 * 24));
-      return daysSinceLast >= 14;
-
-    case 'custom':
-      if (!schedule.lastCompleted) return true;
-      const daysSinceLastCustom = Math.floor((targetDate - schedule.lastCompleted) / (1000 * 60 * 60 * 24));
-      return daysSinceLastCustom >= schedule.interval;
-
-    default:
-      return true;
+    res.status(500).json({ message: error.message });
   }
 };
 
 // Listar todas as tarefas do usuário com filtros
 const getTasks = async (req, res) => {
   try {
-    const { date, type } = req.query;
     const userId = req.user._id;
 
-    let query = { userId };
-    let tasks = [];
-
-    if (date) {
-      const targetDate = new Date(date);
-      targetDate.setHours(0, 0, 0, 0);
-      const nextDate = new Date(targetDate);
-      nextDate.setDate(nextDate.getDate() + 1);
-
-      // Buscar tarefas que se aplicam à data específica
-      tasks = await User.find({
-        userId,
-        $or: [
-          // Tarefas diárias
-          { 'schedule.type': 'daily' },
-          // Tarefas semanais no dia específico
-          {
-            'schedule.type': 'weekly',
-            'schedule.days': targetDate.getDay()
-          },
-          // Tarefas quinzenais
-          {
-            'schedule.type': 'biweekly',
-            $expr: {
-              $eq: [
-                { $mod: [{ $divide: [{ $subtract: [targetDate, new Date('2024-01-01')] }, 1000 * 60 * 60 * 24] }, 14] },
-                0
-              ]
-            }
-          },
-          // Tarefas mensais no dia específico
-          {
-            'schedule.type': 'monthly',
-            'schedule.dayOfMonth': targetDate.getDate()
-          },
-          // Tarefas personalizadas
-          {
-            'schedule.type': 'custom',
-            $expr: {
-              $eq: [
-                { $mod: [{ $divide: [{ $subtract: [targetDate, new Date('2024-01-01')] }, 1000 * 60 * 60 * 24] }, '$schedule.interval'] },
-                0
-              ]
-            }
-          },
-          // Tarefas em data específica
-          {
-            'schedule.type': 'specific',
-            'schedule.specificDate': {
-              $gte: targetDate,
-              $lt: nextDate
-            }
-          }
-        ]
-      });
-    } else if (type) {
-      tasks = await User.find({ ...query, 'schedule.type': type });
-    } else {
-      tasks = await User.find(query);
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'Usuário não encontrado' });
     }
 
-    // Organizar tarefas por dia da semana
-    const tasksByDay = {
-      domingo: [],
-      segunda: [],
-      terca: [],
-      quarta: [],
-      quinta: [],
-      sexta: [],
-      sabado: []
-    };
-
-    tasks.forEach(task => {
-      if (task.schedule.type === 'weekly') {
-        task.schedule.days.forEach(day => {
-          const dayNames = ['domingo', 'segunda', 'terca', 'quarta', 'quinta', 'sexta', 'sabado'];
-          tasksByDay[dayNames[day]].push(task);
-        });
-      } else if (task.schedule.type === 'specific') {
-        const specificDate = new Date(task.schedule.specificDate);
-        const dayNames = ['domingo', 'segunda', 'terca', 'quarta', 'quinta', 'sexta', 'sabado'];
-        tasksByDay[dayNames[specificDate.getDay()]].push(task);
-      } else {
-        // Para outros tipos, adicionar em todos os dias
-        Object.keys(tasksByDay).forEach(day => {
-          tasksByDay[day].push(task);
-        });
-      }
-    });
-
-    res.json({ tasks, tasksByDay });
+    res.json(user.tasks);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -170,7 +47,7 @@ const getTasks = async (req, res) => {
 const updateTask = async (req, res) => {
   try {
     const { taskId } = req.params;
-    const { title, description, completed, schedule } = req.body;
+    const { title, description, list_dates, completed, time } = req.body;
     const userId = req.user._id;
 
     const user = await User.findById(userId);
@@ -183,20 +60,34 @@ const updateTask = async (req, res) => {
       return res.status(404).json({ message: 'Tarefa não encontrada' });
     }
 
-    if (title) task.title = title;
-    if (description) task.description = description;
+    const updatedFields = {};
+    if (title) {
+      task.title = title;
+      updatedFields.title = title;
+    }
+
+    if (description) {
+      task.description = description;
+      updatedFields.description = description;
+    }
+
+    if (list_dates) {
+      task.list_dates = list_dates;
+      updatedFields.list_dates = list_dates;
+    }
+
+    if (time) {
+      task.time = time;
+      updatedFields.time = time;
+    }
+
     if (completed !== undefined) {
       task.completed = completed;
-      if (completed) {
-        task.schedule.lastCompleted = new Date();
-      }
-    }
-    if (schedule) {
-      task.schedule = { ...task.schedule, ...schedule };
+      updatedFields.completed = completed;
     }
 
     await user.save();
-    res.json(task);
+    res.status(200).json({ updated: updatedFields });
   } catch (error) {
     res.status(500).json({ message: 'Erro ao atualizar tarefa' });
   }
@@ -207,6 +98,10 @@ const deleteTask = async (req, res) => {
   try {
     const { taskId } = req.params;
     const userId = req.user._id;
+
+    if (!taskId) {
+      return res.status(400).json({ message: 'ID da tarefa é obrigatório' });
+    }
 
     const user = await User.findById(userId);
     if (!user) {
@@ -227,9 +122,54 @@ const deleteTask = async (req, res) => {
   }
 };
 
+const checkedTask = async (req, res) => {
+  try {
+    const { taskId } = req.params;
+    const userId = req.user._id;
+    const { datesToMove } = req.body;
+
+    if (!datesToMove || !Array.isArray(datesToMove) || datesToMove.length === 0) {
+      return res.status(400).json({ message: 'Datas para marcar como concluídas são obrigatórias' });
+    }
+
+    if (!taskId) {
+      return res.status(400).json({ message: 'ID da tarefa é obrigatório' });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'Usuário não encontrado' });
+    }
+
+    const task = user.tasks.id(taskId);
+    if (!task) {
+      return res.status(404).json({ message: 'Tarefa não encontrada' });
+    }
+
+    // Verifica se a data existe no list_dates
+    const dateIndex = task.list_dates.findIndex(date => date.toISOString() === new Date(datesToMove).toISOString());
+    if (dateIndex === -1) throw new Error("Data não encontrada em list_dates");
+
+    // Remove a data de list_dates
+    const [removedDate] = task.list_dates.splice(dateIndex, 1);
+
+    // Adiciona a data em completed (se ainda não existir)
+    if (!task.completed.some(date => date.toISOString() === removedDate.toISOString())) {
+      task.completed.push(removedDate);
+    }
+    // Marca a tarefa como concluída
+    task.lastCompleted = new Date();
+    await user.save();
+    res.json({ message: 'Tarefa marcada como concluída', task });
+  } catch (error) {
+    res.status(500).json({ message: 'Erro ao marcar tarefa como concluída', error: error.message });
+  }
+}
+
 module.exports = {
   createTask,
   getTasks,
   updateTask,
-  deleteTask
-}; 
+  deleteTask,
+  checkedTask
+};

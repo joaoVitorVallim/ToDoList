@@ -4,15 +4,17 @@ const {
   createTask, 
   getTasks, 
   updateTask, 
-  deleteTask 
+  deleteTask,
+  checkedTask
 } = require('../controllers/taskController');
 const { isAuthenticated } = require('../middleware/auth');
-const { validateTask } = require('../middleware/taskValidation');
+const { validateTask, validateUpdateTask } = require('../middleware/taskValidation');
 
 router.use(isAuthenticated);
 router.post('/', validateTask, createTask);
 router.get('/', getTasks);
-router.put('/:taskId', validateTask, updateTask);
+router.put('/:taskId', validateUpdateTask, updateTask);
 router.delete('/:taskId', deleteTask);
+router.post('/checked/:taskId', checkedTask); // FAZER VERIFICAR DE DATA -> "Invalid time value"
 
 module.exports = router; 
