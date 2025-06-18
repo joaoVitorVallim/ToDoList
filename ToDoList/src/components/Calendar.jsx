@@ -12,6 +12,7 @@ export default function Calendar({ tasks, onDateSelect, getIncompleteTasks }) {
     
     const days = [];
     const today = new Date();
+    const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
     
     // Preencher os dias vazios do início do mês
     for (let i = 0; i < firstDayOfMonth; i++) {
@@ -21,20 +22,48 @@ export default function Calendar({ tasks, onDateSelect, getIncompleteTasks }) {
     // Preencher os dias do mês
     for (let day = 1; day <= daysInMonth; day++) {
       const currentDay = new Date(year, month, day);
-      const isPast = currentDay < new Date(today.getFullYear(), today.getMonth(), today.getDate());
-      const isToday = currentDay.toDateString() === today.toDateString();
+      const currentDayStart = new Date(currentDay.getFullYear(), currentDay.getMonth(), currentDay.getDate());
+      const isPast = currentDayStart < todayStart;
+      const isToday = currentDayStart.getTime() === todayStart.getTime();
       
       const dateKey = currentDay.toDateString();
-      const dayTasks = tasks[dateKey] || [];
-      const incompleteTasks = dayTasks.filter(task => !task.completed).length;
-      const completedTasks = dayTasks.filter(task => task.completed).length;
+      
+      // Filtrar tarefas que têm esta data específica
+      const dayTasks = tasks.filter(task =>
+        task.dates.some(dateEntry => 
+          dateEntry.date.toDateString() === dateKey
+        )
+      );
+      
+      // Calcular tarefas por status para esta data específica
+      let incompleteTasks = 0;
+      let completedTasks = 0;
+      let failedTasks = 0;
+      
+      dayTasks.forEach(task => {
+        const dateEntry = task.dates.find(dateEntry => 
+          dateEntry.date.toDateString() === dateKey
+        );
+        
+        if (dateEntry) {
+          if (dateEntry.completed) {
+            completedTasks++;
+          } else if (isPast) {
+            failedTasks++;
+          } else {
+            incompleteTasks++;
+          }
+        }
+      });
       
       days.push({
         date: currentDay,
         isPast,
         isToday,
         incompleteTasks,
-        completedTasks
+        completedTasks,
+        failedTasks,
+        totalTasks: dayTasks.length
       });
     }
     
@@ -92,13 +121,18 @@ export default function Calendar({ tasks, onDateSelect, getIncompleteTasks }) {
                 <span className="day-number">{day.date.getDate()}</span>
                 <div className="task-counts">
                   {day.incompleteTasks > 0 && (
-                    <div className="task-count incomplete">
-                      {day.incompleteTasks} pendente{day.incompleteTasks !== 1 ? 's' : ''}
+                    <div className="task-count incomplete-circle">
+                      {day.incompleteTasks}
                     </div>
                   )}
                   {day.completedTasks > 0 && (
-                    <div className="task-count complete">
-                      {day.completedTasks} concluída{day.completedTasks !== 1 ? 's' : ''}
+                    <div className="task-count complete-circle">
+                      {day.completedTasks}
+                    </div>
+                  )}
+                  {day.failedTasks > 0 && (
+                    <div className="task-count failed-circle">
+                      {day.failedTasks}
                     </div>
                   )}
                 </div>

@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { NavLink, Link } from "react-router-dom";
 import "./css/header.css";
 
 export default function Header() {
@@ -8,14 +8,17 @@ export default function Header() {
         <img src="/logo.png" alt="Logo" style={{ height: '36px', width: '36px', objectFit: 'contain' }} />
         ToDoLIST
       </div>
-
-        <Link to="/tarefas" className="link">
+      <nav className="header-nav">
+        <NavLink to="/dashboard" className={({ isActive }) => isActive ? "link active" : "link"}>
+          Dashboard
+        </NavLink>
+        <NavLink to="/tarefas" className={({ isActive }) => isActive ? "link active" : "link"}>
           Tarefas
-        </Link>
-        <Link to="/" className="logout">
-          Logout
-        </Link>
-      
+        </NavLink>
+      </nav>
+      <Link to="/" className="logout">
+        Logout
+      </Link>
     </header>
   );
 }

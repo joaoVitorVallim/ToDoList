@@ -7,17 +7,33 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 18px;
 }
 
 .todolist_logo {
     background-color: #1E1E1E;
+    font-size: 1.35rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+
+.header-nav {
+    display: flex;
+    gap: 36px;
+    flex: 1;
+    justify-content: center;
+    align-items: center;
 }
 
 .link {
     color: #FFFFFF;
     text-decoration: none;
     font-size: 18px;
-    background-color: #1E1E1E;
+    background-color: transparent;
+    padding: 2px 8px;
+    border-radius: 4px;
+    transition: background 0.2s, color 0.2s;
+    font-weight: 700;
 }
 
 .logout {
@@ -28,4 +44,51 @@ header {
     border-radius: 4px;
     cursor: pointer;
     font-size: 16px;
+    font-weight: 700;
+    margin-left: 18px;
+    justify-content: center;
+}
+
+.link.active {
+    color: #ffffff;
+    background: #232526;
+    border-bottom: 3px solid #ffffff;
+    border-radius: 0;
+}
+
+@media (max-width: 700px) {
+    header {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 8px 2vw 8px 2vw;
+        gap: 8px;
+    }
+    .todolist_logo {
+        justify-content: center;
+        font-size: 1.1rem;
+        margin-bottom: 4px;
+    }
+    .header-nav {
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        margin: 0 0 8px 0;
+    }
+    .link {
+        font-size: 1rem;
+        padding: 4px 0;
+        width: 100%;
+        text-align: center;
+    }
+    .link.active {
+        border-bottom: 2px solid #fff;
+    }
+    .logout {
+        margin-left: 0;
+        text-align: center;
+        width: 100%;
+        margin-top: 6px;
+        font-size: 1rem;
+        padding: 10px 0;
+    }
 }
