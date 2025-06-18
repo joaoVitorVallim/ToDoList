@@ -1,27 +1,26 @@
 header {
     background-color: #1E1E1E;
     font-weight: bold;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
     color: #FFFFFF;
     font-size: 1.5rem;
     padding: 15px 30px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-  }
+}
 
-  .todolist_logo {
+.todolist_logo {
     background-color: #1E1E1E;
-  }
+}
 
-  .link {
+.link {
     color: #FFFFFF;
     text-decoration: none;
     font-size: 18px;
     background-color: #1E1E1E;
-  }
+}
 
-  .logout {
+.logout {
     background-color: #FF5252;
     color: #FFFFFF;
     border: none;
@@ -29,4 +28,4 @@ header {
     border-radius: 4px;
     cursor: pointer;
     font-size: 16px;
-  }
+}

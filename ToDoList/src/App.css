@@ -1,0 +1,65 @@
+.app {
+  min-height: 100vh;
+  background-color: #121212;
+  color: #fff;
+  padding: 20px;
+}
+
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  padding: 0 20px;
+}
+
+.app-header h1 {
+  margin: 0;
+  font-size: 2rem;
+  color: #fff;
+}
+
+.new-task-button {
+  background-color: #4a5a6a;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.new-task-button:hover {
+  background-color: #505050;
+}
+
+.new-task-button:active {
+  background-color: #3a4652;
+}
+
+.app-main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+@media (max-width: 768px) {
+  .app-header {
+    flex-direction: column;
+    gap: 20px;
+    text-align: center;
+  }
+
+  .app-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .new-task-button {
+    width: 100%;
+    justify-content: center;
+  }
+} 

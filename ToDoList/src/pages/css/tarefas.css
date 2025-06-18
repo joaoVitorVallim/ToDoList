@@ -1,67 +1,66 @@
 .titulo {
   text-align: center;
-  margin-top: 20px;
+  margin-top: 25px;
+  color: #fff;
 }
 
-/* 🔥 Wrapper que permite que a scrollbar fique em cima */
-.scroll-wrapper {
-  position: relative;
-  padding-top: 20px;
-  margin-top: 20px;
-  margin-left: 20px;
-  margin-right: 20px;
-}
-
-.scroll-wrapper::before {
-  content: "";
-  display: block;
-  height: 8px;
-  background-color: transparent;
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  overflow-x: auto;
-  pointer-events: none;
-}
-
-.container-horizontal {
+.tasks-container {
   display: flex;
+  flex-direction: column;
   gap: 20px;
-  overflow-x: auto;
-  overflow-y: hidden;
-  padding: 20px 10px;
-  scroll-behavior: smooth;
-  /* Forçando a barra de rolagem para o topo */
-  transform: scaleY(-1);
-}
-
-.container-horizontal:active {
-  cursor: grabbing;
-}
-
-/* Inverte o conteúdo para compensar a rotação do container */
-.card {
-  /* Revertendo a rotação do card */
-  transform: scaleY(-1);
-  min-width: 250px;
-  background-color: #1e1e1e;
   padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.tasks-list {
+  background-color: #1e1e1e;
   border-radius: 8px;
+  padding: 20px;
   box-shadow: 0 0 10px rgba(0,0,0,0.5);
-  flex-shrink: 0;
 }
 
-.card h2 {
+.tasks-list h2 {
+  color: #fff;
   margin-top: 0;
+  margin-bottom: 20px;
 }
 
-.card ul {
-  padding-left: 20px;
+.task-input {
+  margin-bottom: 20px;
 }
 
-.card li {
-  margin-bottom: 8px;
+.task-input input {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 4px;
+  background-color: #2a2a2a;
+  color: #fff;
+  font-size: 16px;
+}
+
+.task-input input::placeholder {
+  color: #888;
+}
+
+.task-input input:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px #4a5a6a;
+}
+
+.tasks-list ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.tasks-list li {
+  margin-bottom: 10px;
+}
+
+.tasks-list li.completed {
+  opacity: 0.5;
 }
 
 .checkbox {
@@ -71,6 +70,7 @@
   font-size: 16px;
   user-select: none;
   gap: 8px;
+  color: #fff;
 }
 
 /* Esconde o checkbox nativo */
@@ -83,7 +83,7 @@
   width: 20px;
   height: 20px;
   background-color: #222;
-  border: 2px solid #4caf50; /* Cor da borda verde */
+  border: 2px solid #4a5a6a; /* Cor da borda azul acinzentado */
   border-radius: 4px;
   position: relative;
   transition: background-color 0.2s;
@@ -93,7 +93,7 @@
 
 /* Desenhar o check quando estiver marcado */
 .checkbox input:checked + .checkmark {
-  background-color: #4caf50;
+  background-color: #4a5a6a;
 }
 
 .checkbox .checkmark::after {
@@ -118,23 +118,23 @@
   transform: translate(-50%, -50%) rotate(45deg);
 }
 
-/* Estilização da barra de rolagem */
-.container-horizontal::-webkit-scrollbar {
-  height: 8px;
-  cursor: pointer;
-}
-
-.container-horizontal::-webkit-scrollbar-track {
-  background: #222;
-  cursor: pointer;
-}
-
-.container-horizontal::-webkit-scrollbar-thumb {
-  background-color: #555;
+.add-task-button {
+  background-color: #4a5a6a;
+  color: white;
+  border: none;
   border-radius: 4px;
+  padding: 12px 24px;
+  font-size: 16px;
   cursor: pointer;
+  transition: background-color 0.2s;
+  width: 200px;
 }
 
-.container-horizontal::-webkit-scrollbar-thumb:hover {
+.add-task-button:hover {
+  background-color: #505050;
+}
+
+.add-task-button:disabled {
   background-color: #666;
+  cursor: not-allowed;
 }
