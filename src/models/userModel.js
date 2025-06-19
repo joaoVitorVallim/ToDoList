@@ -7,7 +7,6 @@ const taskSchema = new Schema({
     list_dates: [{ type: Date, required: true }],
     completed: [{ type: Date, default: [] }],
     time: { type: String, required: true }, // Format: HH:mm
-    lastCompleted: { type: Date, default: null },
     createdAt: { type: Date, default: Date.now }
 });
 
@@ -17,7 +16,9 @@ const userSchema = new Schema({
     passwordHash: { type: String, required: false },
     googleId: { type: String, unique: true, sparse: true },
     tasks: [taskSchema],
-    createdAt: { type: Date, default: Date.now }
+    createdAt: { type: Date, default: Date.now },
+    resetCode: { type: String, default: null },
+    resetCodeExpires: { type: Date, default: null }
 });
 
 module.exports = mongoose.model('User', userSchema);

@@ -96,7 +96,7 @@ const updateTask = async (req, res) => {
 // Deletar uma tarefa
 const deleteTask = async (req, res) => {
   try {
-    const { taskId } = req.params;
+    const { taskId, date } = req.params;
     const userId = req.user._id;
 
     if (!taskId) {
@@ -113,12 +113,26 @@ const deleteTask = async (req, res) => {
       return res.status(404).json({ message: 'Tarefa não encontrada' });
     }
 
-    user.tasks.pull(taskId);
+    if (date) {
+      const parsedDate = new Date(date);
+      if (isNaN(parsedDate)) {
+        return res.status(400).json({ message: 'Data inválida' });
+      }
+
+      task.list_dates = task.list_dates.filter(d => {
+        const dDate = new Date(d);
+        return dDate.toISOString() !== parsedDate.toISOString();
+      });
+    } else {
+      user.tasks.pull(taskId);
+    }
+
+
     await user.save();
 
     res.json({ message: 'Tarefa deletada com sucesso' });
   } catch (error) {
-    res.status(500).json({ message: 'Erro ao deletar tarefa' });
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -129,7 +143,7 @@ const checkedTask = async (req, res) => {
     const { datesToMove } = req.body;
 
     if (!datesToMove || !Array.isArray(datesToMove) || datesToMove.length === 0) {
-      return res.status(400).json({ message: 'Datas para marcar como concluídas são obrigatórias' });
+      return res.status(400).json({ message: 'Datas são obrigatórias' });
     }
 
     if (!taskId) {
@@ -146,25 +160,40 @@ const checkedTask = async (req, res) => {
       return res.status(404).json({ message: 'Tarefa não encontrada' });
     }
 
-    // Verifica se a data existe no list_dates
-    const dateIndex = task.list_dates.findIndex(date => date.toISOString() === new Date(datesToMove).toISOString());
-    if (dateIndex === -1) throw new Error("Data não encontrada em list_dates");
+    datesToMove.forEach(dateStr => {
+      const parsedDate = new Date(dateStr);
+      if (isNaN(parsedDate)) {
+        throw new Error(`Data inválida: ${dateStr}`);
+      }
 
-    // Remove a data de list_dates
-    const [removedDate] = task.list_dates.splice(dateIndex, 1);
+      const dateISO = parsedDate.toISOString();
 
-    // Adiciona a data em completed (se ainda não existir)
-    if (!task.completed.some(date => date.toISOString() === removedDate.toISOString())) {
-      task.completed.push(removedDate);
-    }
-    // Marca a tarefa como concluída
-    task.lastCompleted = new Date();
+      const isInListDates = task.list_dates.findIndex(d => new Date(d).toISOString() === dateISO);
+      const isInCompleted = task.completed.findIndex(d => new Date(d).toISOString() === dateISO);
+
+      if (isInListDates !== -1) {
+        // 🔄 Está em list_dates → Move para completed
+        const [removedDate] = task.list_dates.splice(isInListDates, 1);
+        task.completed.push(removedDate);
+      } else if (isInCompleted !== -1) {
+        // 🔄 Está em completed → Volta para list_dates
+        const [removedDate] = task.completed.splice(isInCompleted, 1);
+        task.list_dates.push(removedDate);
+      } else {
+        throw new Error(`Data ${dateStr} não encontrada em list_dates nem em completed`);
+      }
+    });
     await user.save();
-    res.json({ message: 'Tarefa marcada como concluída', task });
+
+    res.json({ message: 'Status da(s) data(s) alterado com sucesso', task });
   } catch (error) {
-    res.status(500).json({ message: 'Erro ao marcar tarefa como concluída', error: error.message });
+    res.status(500).json({
+      message: 'Erro ao alterar status da(s) data(s)',
+      error: error.message
+    });
   }
-}
+};
+
 
 module.exports = {
   createTask,
