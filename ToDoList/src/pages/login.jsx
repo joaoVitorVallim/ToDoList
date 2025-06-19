@@ -25,6 +25,21 @@ export default function Login() {
       <form onSubmit={handleLogin} className="form">
         <h2 className="title">Login</h2>
 
+        <button
+          className="button google-button"
+          type="button"
+          onClick={() => alert('Funcionalidade de login com Google ainda não implementada!')}
+        >
+          <img
+            src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+            alt="Google"
+            style={{ width: 20, height: 20, marginRight: 8, verticalAlign: 'middle' }}
+          />
+          Entrar com Google
+        </button>
+
+        <div className="divider"><span>ou</span></div>
+
         <input
           className="input"
           type="email"
@@ -46,6 +61,18 @@ export default function Login() {
         <button className="button" type="submit">
           Entrar
         </button>
+
+        <button
+          className="button secondary-button"
+          type="button"
+          onClick={() => navigate('/cadastro')}
+        >
+          Criar conta
+        </button>
+
+        <div className="forgot-link-container">
+          <a href="/esqueci-senha" className="forgot-link">Esqueci minha senha</a>
+        </div>
       </form>
     </div>
     </div>

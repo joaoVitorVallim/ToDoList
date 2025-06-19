@@ -91,7 +91,7 @@ const TasksList = ({ isOpen, onClose, selectedDate, tasks, onToggleTask, onEditT
                       <button className="edit-task-btn" title="Editar" onClick={() => onEditTask && onEditTask(task)}>
                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14.7 2.29a1 1 0 0 1 1.41 0l1.6 1.6a1 1 0 0 1 0 1.41l-9.34 9.34-2.83.71.71-2.83 9.34-9.34ZM3 17h14v2H3v-2Z" fill="currentColor"/></svg>
                       </button>
-                      <button className="delete-task-btn" title="Excluir" onClick={() => onDeleteTask && onDeleteTask(task.id)}>
+                      <button className="delete-task-btn" title="Excluir" onClick={() => onDeleteTask && onDeleteTask(task)}>
                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 6h10M7 6v10a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1V6m-7 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
                       </button>
                     </td>

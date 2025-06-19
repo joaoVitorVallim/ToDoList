@@ -2,7 +2,7 @@
 .dashboard-container {
   max-width: 1000px;
   margin: 24px auto;
-  background: #232526;
+  background: #1e1e1e;
   border-radius: 12px;
   box-shadow: 0 2px 12px #0002;
   padding: 18px 6px 24px 6px;
@@ -29,7 +29,7 @@
 }
 .dashboard-card {
   flex: 1 1 120px;
-  background: #1e1e1e;
+  background: #333;
   border-radius: 8px;
   padding: 12px 8px;
   display: flex;
@@ -104,7 +104,7 @@
 }
 .dashboard-next-tasks {
   margin-top: 18px;
-  background: #23272b;
+  background: #333;
   border-radius: 10px;
   box-shadow: 0 2px 8px #0002;
   padding: 18px 18px 24px 18px;
@@ -197,7 +197,6 @@
     max-width: 480px;
     min-width: 0;
     padding: 4px 10px 8px 10px;
-    margin: 0 auto;
     border-radius: 8px;
     overflow-x: hidden;
     box-sizing: border-box;

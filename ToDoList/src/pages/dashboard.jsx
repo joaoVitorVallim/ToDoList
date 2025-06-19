@@ -1,36 +1,10 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import "./css/dashboard.css";
 import Header from "../components/header";
 
-// Função utilitária para simular busca de tarefas do localStorage ou API
-function getAllTasks() {
-  // Aqui você pode integrar com backend ou localStorage
-  const data = localStorage.getItem("tasks");
-  if (data) return JSON.parse(data);
-  return [];
-}
-
 export default function Dashboard() {
-  const [tasks, setTasks] = useState([]);
-
-  useEffect(() => {
-    setTasks(getAllTasks());
-  }, []);
-
-  // Resumo
-  const total = tasks.length;
-  const pendentes = tasks.filter(t => t.dates?.some(d => !d.completed && !d.failed)).length;
-  const concluidas = tasks.filter(t => t.dates?.some(d => d.completed)).length;
-  const falhas = tasks.filter(t => t.dates?.some(d => d.failed)).length;
-
-  // Próximas tarefas (próximos 5 dias)
-  const hoje = new Date();
-  const proximas = tasks
-    .flatMap(t => t.dates?.map(d => ({ ...t, ...d, taskTitle: t.title, taskDesc: t.description, taskTime: t.time })))
-    .filter(d => d.date && new Date(d.date) >= hoje && !d.completed && !d.failed)
-    .sort((a, b) => new Date(a.date) - new Date(b.date))
-    .slice(0, 5);
+  const [showTaskModal, setShowTaskModal] = useState(false);
 
   return (
     <>
@@ -42,24 +16,24 @@ export default function Dashboard() {
         <div className="dashboard-cards">
           <div className="dashboard-card total">
             <span>Total de Tarefas</span>
-            <strong>{total}</strong>
+            <strong>0</strong>
           </div>
           <div className="dashboard-card pendente">
             <span>Pendentes</span>
-            <strong>{pendentes}</strong>
+            <strong>0</strong>
           </div>
           <div className="dashboard-card concluida">
             <span>Concluídas</span>
-            <strong>{concluidas}</strong>
+            <strong>0</strong>
           </div>
           <div className="dashboard-card falha">
             <span>Falhas</span>
-            <strong>{falhas}</strong>
+            <strong>0</strong>
           </div>
         </div>
         <div className="dashboard-graph-section">
           <h2>Resumo Visual</h2>
-          <DashboardPieChart total={total} pendentes={pendentes} concluidas={concluidas} falhas={falhas} />
+          <DashboardPieChart total={0} pendentes={0} concluidas={0} falhas={0} />
           <div className="dashboard-legend">
             <span className="dashboard-legend-item"><span className="dashboard-legend-dot pend"></span>Pendentes</span>
             <span className="dashboard-legend-item"><span className="dashboard-legend-dot conc"></span>Concluídas</span>
@@ -67,22 +41,31 @@ export default function Dashboard() {
           </div>
         </div>
         <div className="dashboard-next-tasks">
-          <h2>Próximas tarefas</h2>
-          {proximas.length === 0 ? (
-            <div className="dashboard-empty">Nenhuma tarefa pendente nos próximos dias.</div>
-          ) : (
-            <ul>
-              {proximas.map((t, i) => (
-                <li key={i}>
-                  <span className="next-task-date">{new Date(t.date).toLocaleDateString("pt-BR")}</span>
-                  <span className="next-task-title">{t.taskTitle}</span>
-                  <span className="next-task-desc">{t.taskDesc}</span>
-                  <span className="next-task-time">{t.taskTime || "--:--"}</span>
-                </li>
-              ))}
-            </ul>
-          )}
+          <h2>Tarefas do dia</h2>
+          {/* Lista visual de tarefas do dia (vazia) */}
+          <ul></ul>
+          <div className="dashboard-empty">Nenhuma tarefa pendente para hoje.</div>
         </div>
+        {/* Modal visual ao clicar em uma tarefa */}
+        {showTaskModal && (
+          <div className="modal-overlay">
+            <div className="modal-content add-task-modal">
+              <div className="modal-header">
+                <h2>Detalhes da Tarefa</h2>
+                <button className="close-button" onClick={() => setShowTaskModal(false)}>&times;</button>
+              </div>
+              <div className="modal-body">
+                <p><b>Título:</b> Exemplo de Tarefa</p>
+                <p><b>Descrição:</b> Descrição da tarefa</p>
+                <p><b>Data:</b> 01/01/2024</p>
+                <p><b>Horário:</b> 08:00</p>
+                <div style={{display: 'flex', justifyContent: 'flex-end', gap: 12, marginTop: 24}}>
+                  <button className="confirm-button" style={{background: '#888'}} onClick={() => setShowTaskModal(false)}>Fechar</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </>
   );
