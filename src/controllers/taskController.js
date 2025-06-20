@@ -72,11 +72,20 @@ const updateTask = async (req, res) => {
     }
 
     if (list_dates) {
+      // Verifica se mudou
+      const oldDates = (task.list_dates || []).map(d => new Date(d).toISOString()).sort();
+      const newDates = (list_dates || []).map(d => new Date(d).toISOString()).sort();
+      const mudou = oldDates.length !== newDates.length || oldDates.some((d, i) => d !== newDates[i]);
       task.list_dates = list_dates;
       updatedFields.list_dates = list_dates;
+      if (mudou) task.notified = [];
     }
 
-    if (time) {
+    if (time && time !== task.time) {
+      task.time = time;
+      updatedFields.time = time;
+      task.notified = [];
+    } else if (time) {
       task.time = time;
       updatedFields.time = time;
     }

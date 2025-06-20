@@ -7,6 +7,7 @@ const taskSchema = new Schema({
     list_dates: [{ type: Date, required: true }],
     completed: [{ type: Date, default: [] }],
     time: { type: String, required: true }, // Format: HH:mm
+    notified: [{ type: Date, default: [] }],
     createdAt: { type: Date, default: Date.now }
 });
 

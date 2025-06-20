@@ -4,6 +4,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
+const sendEmail = require('../utils/sendEmail');
 
 // Login
 const login = async (req, res) => {
@@ -134,41 +135,28 @@ const forgotPassword = async (req, res) => {
       user.resetCodeExpires = expiration;
       await user.save();
 
-      // Configurar e-mail
-      const transporter = nodemailer.createTransport({
-          service: 'gmail',
-          auth: {
-              user: process.env.EMAIL_USER,
-              pass: process.env.EMAIL_PASSWORD
-          }
-      });
-
-      const mailOptions = {
-          from: process.env.EMAIL_USER,
-          to: email,
-          subject: 'Código de Recuperação de Senha',
-          html: `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #ddd; padding: 20px; border-radius: 10px;">
-                <h2 style="color: #333;">Recuperação de Senha</h2>
-                <p>Olá ${user.name},</p>
-                <p>Você solicitou a recuperação da sua senha. Utilize o código abaixo para prosseguir:</p>
-                
-                <div style="text-align: center; margin: 30px 0;">
-                    <span style="display: inline-block; background-color: #4CAF50; color: white; padding: 15px 25px; border-radius: 5px; font-size: 24px; letter-spacing: 3px;">
-                        <strong>${code}</strong>
-                    </span>
-                </div>
-
-                <p>Este código é válido por <strong>15 minutos</strong>.</p>
-                <p>Se você não solicitou essa alteração, por favor, ignore este e-mail.</p>
-
-                <hr style="margin: 30px 0;">
-                <p style="font-size: 12px; color: #777;">© 2025 Meu App. Todos os direitos reservados.</p>
+      // Enviar e-mail usando utilitário
+      await sendEmail({
+        to: email,
+        subject: 'Código de Recuperação de Senha',
+        html: `
+          <body style="background: #f4f4f4; padding: 0; margin: 0;">
+            <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 480px; margin: 40px auto; background: #fff; border-radius: 12px; box-shadow: 0 4px 24px rgba(0,0,0,0.08); padding: 32px 28px; border: 1px solid #e0e0e0;">
+              <h2 style="color: #2e7d32; margin-top: 0; margin-bottom: 18px; font-weight: 700; font-size: 1.6rem; letter-spacing: 1px;">Recuperação de Senha</h2>
+              <p style="color: #333; font-size: 1.05rem; margin-bottom: 18px;">Olá <strong>${user.name}</strong>,</p>
+              <p style="color: #444; margin-bottom: 18px;">Você solicitou a recuperação da sua senha. Utilize o código abaixo para prosseguir:</p>
+              <div style="text-align: center; margin: 18px 0 28px 0;">
+                <span style="display: inline-block; background: linear-gradient(90deg, #43e97b 0%, #38f9d7 100%); color: #fff; padding: 16px 32px; border-radius: 8px; font-size: 1.25rem; font-weight: bold; letter-spacing: 2px; box-shadow: 0 2px 8px rgba(67,233,123,0.10);">
+                  ${code}
+                </span>
+              </div>
+              <p style="color: #333; margin-bottom: 24px;">Este código é válido por <strong>15 minutos</strong>.<br>Se você não solicitou essa alteração, por favor, ignore este e-mail.</p>
+              <hr style="border: none; border-top: 1px solid #eee; margin: 32px 0 18px 0;">
+              <p style="font-size: 12px; color: #aaa; text-align: center;">© 2025 Meu App. Todos os direitos reservados.</p>
             </div>
-            `
-      };
-
-      await transporter.sendMail(mailOptions);
+          </body>
+        `
+      });
 
       res.json({ message: 'Código enviado para seu e-mail' });
     } catch (error) {

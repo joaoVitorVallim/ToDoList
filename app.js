@@ -6,6 +6,7 @@ const connectDB = require('./db');
 const userRoutes = require('./src/routes/userRoute');
 const authRoutes = require('./src/routes/authRoutes');
 const taskRoutes = require('./src/routes/taskRoutes');
+require('./src/utils/taskNotifier');
 
 require('dotenv').config();
 require('./src/config/passport');
@@ -17,8 +18,9 @@ const app = express();
 // Middleware
 app.use(express.json());
 app.use(cors({
-  origin: 'http://localhost:3001',
-  credentials: true
+    origin: 'http://localhost:5173',  // Atualize para a porta do seu frontend
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 // Configuração da sessão
