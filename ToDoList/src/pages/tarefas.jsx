@@ -6,6 +6,8 @@ import TaskModal from "../components/TaskModal.jsx";
 import TasksList from "../components/TasksList";
 import "./css/tarefas.css";
 
+const URL_BASE = import.meta.env.VITE_URL_BASE;
+
 export default function Tarefas() {
   // Estados para controlar a interface
   const [tasks, setTasks] = useState([]); // Lista de todas as tarefas do usuário
@@ -25,14 +27,15 @@ export default function Tarefas() {
   const fetchTasks = useCallback(async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:3000/tasks', {
+      const response = await axios.get( `${URL_BASE}/tasks`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
       });
-      setTasks(response.data);
+      setTasks(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error("Erro ao buscar tarefas:", error);
+      setTasks([]); // Garante que tasks sempre será um array
     }
   }, []);
 
@@ -76,7 +79,7 @@ export default function Tarefas() {
 
       // Envia requisição para marcar como concluída, usando a data no formato ISO
       await axios.post(
-        `http://localhost:3000/tasks/checked/${taskId}`,
+         `${URL_BASE}/tasks/checked/${taskId}`,
         { 
           datesToMove: [date.toISOString()]
         },
@@ -163,7 +166,7 @@ export default function Tarefas() {
       if (deleteFromAllDays) {
         // Excluir a tarefa completamente
         await axios.delete(
-          `http://localhost:3000/tasks/${taskToDelete._id}`,
+           `${URL_BASE}/tasks/${taskToDelete._id}`,
           { headers: { 'Authorization': `Bearer ${token}` } }
         );
 
@@ -217,14 +220,14 @@ export default function Tarefas() {
         ) {
           // Exclui a tarefa do backend e do estado local
           await axios.delete(
-            `http://localhost:3000/tasks/${taskToDelete._id}`,
+             `${URL_BASE}/tasks/${taskToDelete._id}`,
             { headers: { 'Authorization': `Bearer ${token}` } }
           );
           setTasks(updatedTasks.filter(t => t._id !== taskToDelete._id));
         } else {
           // Atualiza a tarefa no backend com as novas datas
           await axios.put(
-            `http://localhost:3000/tasks/${taskToDelete._id}`,
+            `${URL_BASE}/tasks/${taskToDelete._id}`,
             {
               list_dates: tarefaAtualizada.list_dates,
               completed: tarefaAtualizada.completed

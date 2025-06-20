@@ -6,8 +6,9 @@ import axios from 'axios';
 import { registerLocale } from "react-datepicker";
 import ptBR from 'date-fns/locale/pt-BR';
 
-registerLocale('pt-BR', ptBR);
+const URL_BASE = import.meta.env.VITE_URL_BASE;
 
+registerLocale('pt-BR', ptBR);
 /**
  * Componente modal para adicionar ou editar tarefas
  * @param {boolean} showModal - Controla se o modal está visível
@@ -250,7 +251,7 @@ const TaskModal = ({
       if (editingTask) {
         // Atualiza tarefa existente
         response = await axios.put(
-          `http://localhost:3000/tasks/${editingTask._id}`,
+          `${URL_BASE}/tasks/${editingTask._id}`,
           taskData,
           {
             headers: {
@@ -266,7 +267,7 @@ const TaskModal = ({
       } else {
         // Cria nova tarefa
         response = await axios.post(
-          'http://localhost:3000/tasks',
+          `${URL_BASE}/tasks`,
           taskData,
           {
             headers: {

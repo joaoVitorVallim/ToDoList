@@ -4,6 +4,8 @@ import axios from 'axios';
 import "./css/dashboard.css";
 import Header from "../components/header";
 
+const URL_BASE = import.meta.env.VITE_URL_BASE;
+
 export default function Dashboard() {
   // Estados para controlar a interface
   const [showTaskModal, setShowTaskModal] = useState(false); // Controla exibição do modal de detalhes
@@ -19,7 +21,7 @@ export default function Dashboard() {
   const fetchTasks = useCallback(async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:3000/tasks', {
+      const response = await axios.get( `${URL_BASE}/tasks`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }

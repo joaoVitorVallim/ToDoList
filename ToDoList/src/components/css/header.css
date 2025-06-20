@@ -92,3 +92,42 @@ header {
         padding: 10px 0;
     }
 }
+
+.notification-btn {
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    width: auto;
+    height: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #888;
+    transition: color 0.18s;
+    margin-right: 8px;
+    font-size: 0;
+    cursor: pointer;
+    outline: none;
+    box-shadow: none;
+    padding: 0;
+}
+
+.notification-btn.active {
+    color: #219150;
+}
+
+.notification-btn.inactive {
+    color: #888;
+}
+
+.notification-btn:hover {
+    color: #219150;
+}
+
+.notification-btn.inactive:hover {
+    color: #ff9800;
+}
+
+.notification-btn .notif-badge {
+    display: none;
+}
