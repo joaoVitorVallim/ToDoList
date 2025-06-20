@@ -29,7 +29,7 @@ cron.schedule('* * * * *', async () => {
           ) {
             // Enviar notificação
             await sendEmail({
-              to: process.env.DEFAULT_NOTIFICATION_EMAIL || user.email,
+              to: user.email,
               subject: `Lembrete: Tarefa "${task.title}" próxima do prazo!`,
               html: `
                 <body style="background: #f4f4f4; padding: 0; margin: 0;">
