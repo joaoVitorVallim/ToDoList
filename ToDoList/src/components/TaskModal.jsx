@@ -32,6 +32,11 @@ const TaskModal = ({
   const [selectedDates, setSelectedDates] = useState([]); // Datas selecionadas
   const [error, setError] = useState(''); // Mensagem de erro
   const [isSubmitting, setIsSubmitting] = useState(false); // Estado de submissão
+  const [dateRange, setDateRange] = useState([null, null]);
+  const [isMonthSelected, setIsMonthSelected] = useState(false);
+  const [isYearSelected, setIsYearSelected] = useState(false);
+
+  const [startDate, endDate] = dateRange;
 
   /**
    * Preenche o formulário com os dados da tarefa quando está editando
@@ -69,38 +74,128 @@ const TaskModal = ({
   }, [editingTask, showModal]);
 
   /**
-   * Adiciona uma nova data à lista de datas selecionadas
-   * @param {Date} date - Data a ser adicionada
+   * Adiciona ou remove uma data da lista ao ser clicada no calendário
    */
   const handleDateChange = (date) => {
-    if (date && !selectedDates.some(d => d.toDateString() === date.toDateString())) {
-      setSelectedDates(prev => [...prev, date]);
+    if (!date) return;
+
+    const dateIsSelected = selectedDates.some(
+      (selectedDate) => selectedDate.toDateString() === date.toDateString()
+    );
+
+    if (dateIsSelected) {
+      removeDate(date);
+    } else {
+      setSelectedDates(prev => [...prev, date].sort((a, b) => a - b));
     }
   };
 
   /**
    * Remove uma data da lista de datas selecionadas
-   * @param {Date} dateToRemove - Data a ser removida
    */
   const removeDate = (dateToRemove) => {
     setSelectedDates(prev => prev.filter(date => date.toDateString() !== dateToRemove.toDateString()));
   };
 
   /**
-   * Seleciona todas as datas do mês atual
+   * Adiciona um array de datas ao estado, garantindo que não haja duplicatas.
    */
-  const selectAllDates = () => {
+  const addDatesWithoutDuplicates = (datesToAdd) => {
+    const allDates = [...selectedDates, ...datesToAdd];
+    const uniqueDatesMap = new Map();
+
+    allDates.forEach(date => {
+      uniqueDatesMap.set(date.toDateString(), date);
+    });
+
+    const uniqueDates = Array.from(uniqueDatesMap.values());
+    setSelectedDates(uniqueDates.sort((a, b) => a - b));
+  };
+  
+  const getRemainingDatesInMonth = () => {
     const today = new Date();
+    today.setHours(0, 0, 0, 0);
     const year = today.getFullYear();
     const month = today.getMonth();
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-    
-    const allDates = [];
-    for (let day = 1; day <= daysInMonth; day++) {
-      allDates.push(new Date(year, month, day));
+    const lastDayOfMonth = new Date(year, month + 1, 0).getDate();
+    const dates = [];
+    for (let day = today.getDate(); day <= lastDayOfMonth; day++) {
+      dates.push(new Date(year, month, day));
+    }
+    return dates;
+  };
+
+  const getRemainingDatesInYear = () => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const year = today.getFullYear();
+    const dates = [];
+    let currentDate = new Date(today);
+    while (currentDate.getFullYear() === year) {
+      dates.push(new Date(currentDate));
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+    return dates;
+  };
+  
+  const handleMonthCheckboxChange = (e) => {
+    const datesForMonth = getRemainingDatesInMonth();
+    if (e.target.checked) {
+      addDatesWithoutDuplicates(datesForMonth);
+    } else {
+      const monthDateStrings = new Set(datesForMonth.map(d => d.toDateString()));
+      setSelectedDates(prev => prev.filter(d => !monthDateStrings.has(d.toDateString())));
+    }
+  };
+
+  const handleYearCheckboxChange = (e) => {
+    const datesForYear = getRemainingDatesInYear();
+    if (e.target.checked) {
+      addDatesWithoutDuplicates(datesForYear);
+    } else {
+      const yearDateStrings = new Set(datesForYear.map(d => d.toDateString()));
+      setSelectedDates(prev => prev.filter(d => !yearDateStrings.has(d.toDateString())));
+    }
+  };
+
+  useEffect(() => {
+    const datesForMonth = getRemainingDatesInMonth();
+    if (datesForMonth.length > 0) {
+      const allMonthDatesSelected = datesForMonth.every(d1 => 
+        selectedDates.some(d2 => d1.toDateString() === d2.toDateString())
+      );
+      setIsMonthSelected(allMonthDatesSelected);
+    } else {
+      setIsMonthSelected(false);
+    }
+
+    const datesForYear = getRemainingDatesInYear();
+    if (datesForYear.length > 0) {
+      const allYearDatesSelected = datesForYear.every(d1 => 
+        selectedDates.some(d2 => d1.toDateString() === d2.toDateString())
+      );
+      setIsYearSelected(allYearDatesSelected);
+    } else {
+      setIsYearSelected(false);
+    }
+  }, [selectedDates]);
+
+  const selectDateRange = () => {
+    if (!startDate || !endDate || startDate > endDate) {
+      setError("Selecione um período válido.");
+      return;
+    }
+    setError("");
+    const dates = [];
+    let currentDate = new Date(startDate);
+
+    while(currentDate <= endDate) {
+      dates.push(new Date(currentDate));
+      currentDate.setDate(currentDate.getDate() + 1);
     }
     
-    setSelectedDates(allDates);
+    addDatesWithoutDuplicates(dates);
+    setDateRange([null, null]); // Reseta o período após adicionar
   };
 
   /**
@@ -258,53 +353,89 @@ const TaskModal = ({
 
             {/* Seção de seleção de datas */}
             <div className="form-group">
-              <label>Datas *</label>
-              
-              {/* Botão para selecionar todas as datas do mês */}
-              <button
-                type="button"
-                onClick={selectAllDates}
-                className="select-all-dates-button"
-                style={{ marginBottom: '10px' }}
-              >
-                Selecionar todas as datas do mês
-              </button>
-              
-              {/* Calendário para seleção de datas */}
-              <div className="calendar-container">
+              <label>Selecionar Datas</label>
+              <div className="date-selection-container">
                 <DatePicker
                   selected={null}
                   onChange={handleDateChange}
                   inline
                   locale="pt-BR"
-                  dateFormat="dd/MM/yyyy"
+                  minDate={new Date()}
                   highlightDates={selectedDates}
-                  placeholderText="Selecione as datas"
                 />
-              </div>
-              
-              {/* Lista de datas selecionadas */}
-              {selectedDates.length > 0 && (
-                <div className="selected-dates">
-                  <label>Datas selecionadas:</label>
-                  <div className="selected-dates-list">
-                    {selectedDates.map((date, index) => (
-                      <div key={index} className="date-tag">
-                        <span>{date.toLocaleDateString('pt-BR')}</span>
-                        <button
-                          type="button"
-                          onClick={() => removeDate(date)}
-                          className="remove-date"
-                          title="Remover data"
-                        >
-                          ×
-                        </button>
-                      </div>
-                    ))}
+                <div className="date-selection-actions">
+                  <div className="date-presets">
+                    <div className="checkbox-preset">
+                      <input
+                        type="checkbox"
+                        id="month-checkbox"
+                        checked={isMonthSelected}
+                        onChange={handleMonthCheckboxChange}
+                      />
+                      <label htmlFor="month-checkbox">Mês Inteiro</label>
+                    </div>
+                    <div className="checkbox-preset">
+                      <input
+                        type="checkbox"
+                        id="year-checkbox"
+                        checked={isYearSelected}
+                        onChange={handleYearCheckboxChange}
+                      />
+                      <label htmlFor="year-checkbox">Ano Inteiro</label>
+                    </div>
+                  </div>
+                  <div className="date-range-selector">
+                    <p>Selecione um período específico:</p>
+                    <DatePicker
+                      selectsRange={true}
+                      startDate={startDate}
+                      endDate={endDate}
+                      onChange={(update) => {
+                        setDateRange(update);
+                      }}
+                      minDate={new Date()}
+                      placeholderText="Clique para selecionar o período"
+                      className="date-range-input"
+                      locale="pt-BR"
+                      isClearable={true}
+                      dateFormat="dd/MM/yyyy"
+                    />
+                    <button type="button" onClick={selectDateRange}>Adicionar Período</button>
                   </div>
                 </div>
-              )}
+              </div>
             </div>
+
+            {/* Lista de datas selecionadas */}
+            {selectedDates.length > 0 && (
+              <div className="form-group">
+                <div className="selected-dates-header">
+                  <label>Datas selecionadas ({selectedDates.length})</label>
+                  <button 
+                    type="button" 
+                    onClick={() => setSelectedDates([])} 
+                    className="clear-all-button"
+                  >
+                    Limpar tudo
+                  </button>
+                </div>
+                <div className="selected-dates-list">
+                  {selectedDates.sort((a,b) => a - b).map((date, index) => (
+                    <div key={index} className="date-tag">
+                      <span>{date.toLocaleDateString('pt-BR')}</span>
+                      <button
+                        type="button"
+                        onClick={() => removeDate(date)}
+                        className="remove-date"
+                        title="Remover data"
+                      >
+                        &times;
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Mensagem de erro */}
             {error && (
