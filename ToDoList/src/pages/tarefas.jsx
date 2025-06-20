@@ -127,36 +127,19 @@ export default function Tarefas() {
 
   /**
    * Atualiza uma tarefa existente
-   * @param {Object} updatedTaskData - Dados atualizados da tarefa
+   * @param {Object} updatedTask - Dados atualizados da tarefa
    */
-  const handleUpdateTask = async (updatedTaskData) => {
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) throw new Error("Token não encontrado.");
-
-      // Envia requisição para atualizar a tarefa
-      await axios.put(
-        `http://localhost:3000/tasks/${editingTask._id}`,
-        updatedTaskData,
-        { headers: { 'Authorization': `Bearer ${token}` } }
-      );
-
-      // Atualiza o estado local
-      setTasks(prevTasks =>
-        prevTasks.map(task =>
-          task._id === editingTask._id
-            ? { ...task, ...updatedTaskData }
-            : task
-        )
-      );
-
-      // Fecha o modal e limpa o estado
-      setShowEditModal(false);
-      setEditingTask(null);
-      fetchTasks(); // Re-busca as tarefas para garantir consistência
-    } catch (error) {
-      console.error("Erro ao atualizar tarefa:", error.response ? error.response.data : error.message);
-    }
+  const handleUpdateTask = (updatedTask) => {
+    setTasks(prevTasks =>
+      prevTasks.map(task =>
+        task._id === updatedTask._id
+          ? { ...task, ...updatedTask }
+          : task
+      )
+    );
+    setShowEditModal(false);
+    setEditingTask(null);
+    fetchTasks(); // Opcional, para garantir consistência
   };
 
   /**
@@ -226,18 +209,30 @@ export default function Tarefas() {
           return task;
         });
 
-        // Atualizar no backend
-        await axios.put(
-          `http://localhost:3000/tasks/${taskToDelete._id}`,
-          {
-            list_dates: updatedTasks.find(t => t._id === taskToDelete._id).list_dates,
-            completed: updatedTasks.find(t => t._id === taskToDelete._id).completed
-          },
-          { headers: { 'Authorization': `Bearer ${token}` } }
-        );
-
-        // Atualizar o estado local
-        setTasks(updatedTasks);
+        // Verifica se a tarefa ficou sem datas
+        const tarefaAtualizada = updatedTasks.find(t => t._id === taskToDelete._id);
+        if (
+          tarefaAtualizada.list_dates.length === 0 &&
+          (!tarefaAtualizada.completed || tarefaAtualizada.completed.length === 0)
+        ) {
+          // Exclui a tarefa do backend e do estado local
+          await axios.delete(
+            `http://localhost:3000/tasks/${taskToDelete._id}`,
+            { headers: { 'Authorization': `Bearer ${token}` } }
+          );
+          setTasks(updatedTasks.filter(t => t._id !== taskToDelete._id));
+        } else {
+          // Atualiza a tarefa no backend com as novas datas
+          await axios.put(
+            `http://localhost:3000/tasks/${taskToDelete._id}`,
+            {
+              list_dates: tarefaAtualizada.list_dates,
+              completed: tarefaAtualizada.completed
+            },
+            { headers: { 'Authorization': `Bearer ${token}` } }
+          );
+          setTasks(updatedTasks);
+        }
       }
       
       // Fechar os modais
