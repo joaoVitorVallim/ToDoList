@@ -215,5 +215,19 @@ const resetVerify = async (req, res) => {
     }
 };
 
+// Atualizar preferência de notificação
+const updateNotificationPreference = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+    if (!user) return res.status(404).json({ message: 'Usuário não encontrado' });
 
-module.exports = { getUsers, deleteUser, cadastro, login, getCurrentUser, forgotPassword, resetPassword, resetVerify };
+    user.notificationsEnabled = req.body.notificationsEnabled;
+    await user.save();
+
+    res.json({ notificationsEnabled: user.notificationsEnabled });
+  } catch (error) {
+    res.status(500).json({ message: 'Erro ao atualizar preferência' });
+  }
+};
+
+module.exports = { getUsers, deleteUser, cadastro, login, getCurrentUser, forgotPassword, resetPassword, resetVerify, updateNotificationPreference };

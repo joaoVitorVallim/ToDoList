@@ -14,6 +14,7 @@ cron.schedule('* * * * *', async () => {
     // Buscar todos os usuários
     const users = await User.find();
     for (const user of users) {
+      if (!user.notificationsEnabled) continue;
       for (const task of user.tasks) {
         // Para cada data da task ainda não concluída
         if (!task.list_dates || !Array.isArray(task.list_dates)) continue;

@@ -19,7 +19,8 @@ const userSchema = new Schema({
     tasks: [taskSchema],
     createdAt: { type: Date, default: Date.now },
     resetCode: { type: String, default: null },
-    resetCodeExpires: { type: Date, default: null }
+    resetCodeExpires: { type: Date, default: null },
+    notificationsEnabled: { type: Boolean, default: true }
 });
 
 module.exports = mongoose.model('User', userSchema);

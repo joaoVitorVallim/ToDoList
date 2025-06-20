@@ -8,7 +8,8 @@ const {
   forgotPassword,
   resetPassword,
   resetVerify,
-  getCurrentUser
+  getCurrentUser,
+  updateNotificationPreference
 } = require('../controllers/userController');
 const { isAuthenticated } = require('../middleware/auth');
 
@@ -22,5 +23,7 @@ router.post('/reset-password', resetPassword);
 router.get('/me', isAuthenticated, getCurrentUser);
 router.get('/', isAuthenticated, getUsers);
 router.delete('/:id', isAuthenticated, deleteUser);
+
+router.put('/notifications', isAuthenticated, updateNotificationPreference);
 
 module.exports = router;
