@@ -23,43 +23,82 @@ export default function Calendar({ tasks, onDateSelect, getIncompleteTasks }) {
     for (let day = 1; day <= daysInMonth; day++) {
       const currentDay = new Date(year, month, day);
       const currentDayStart = new Date(currentDay.getFullYear(), currentDay.getMonth(), currentDay.getDate());
-      const isPast = currentDayStart < todayStart;
+      const isPastDay = currentDayStart < todayStart;
       const isToday = currentDayStart.getTime() === todayStart.getTime();
       
-      const dateKey = currentDay.toDateString();
+      const dateKey = currentDay.toISOString().split('T')[0];
       
-      // Filtrar tarefas que têm esta data específica
-      const dayTasks = tasks.filter(task =>
-        task.dates.some(dateEntry => 
-          dateEntry.date.toDateString() === dateKey
-        )
-      );
+      const dayTasks = tasks.filter(task => {
+        // Verifica se a tarefa está em list_dates (pendente)
+        const isInListDates = task.list_dates.some(d => 
+          (typeof d === 'string' && d.startsWith(dateKey)) ||
+          (typeof d === 'object' && d.date && d.date.startsWith(dateKey)) ||
+          (d instanceof Date && d.toISOString().split('T')[0] === dateKey)
+        );
+        
+        // Verifica se a tarefa está em completed (concluída)
+        const isCompleted = task.completed && task.completed.some(d => 
+          (typeof d === 'string' && d.startsWith(dateKey)) ||
+          (typeof d === 'object' && d.date && d.date.startsWith(dateKey)) ||
+          (d instanceof Date && d.toISOString().split('T')[0] === dateKey)
+        );
+        
+        // Retorna true se a tarefa está em list_dates OU completed para esta data
+        return isInListDates || isCompleted;
+      });
       
-      // Calcular tarefas por status para esta data específica
       let incompleteTasks = 0;
       let completedTasks = 0;
       let failedTasks = 0;
       
       dayTasks.forEach(task => {
-        const dateEntry = task.dates.find(dateEntry => 
-          dateEntry.date.toDateString() === dateKey
-        );
-        
-        if (dateEntry) {
-          if (dateEntry.completed) {
-            completedTasks++;
-          } else if (isPast) {
-            failedTasks++;
-          } else {
-            incompleteTasks++;
+        let taskHasFailed = isPastDay;
+        if (isToday && task.time) {
+          const [hours, minutes] = task.time.split(':');
+          const taskDateTime = new Date();
+          taskDateTime.setHours(parseInt(hours), parseInt(minutes), 59, 999);
+          if (taskDateTime < new Date()) {
+            taskHasFailed = true;
           }
+        }
+
+        // Verifica se a tarefa está concluída para esta data
+        const isCompletedOnDate = task.completed && task.completed.some(d => {
+          if (typeof d === 'string') {
+            return d.startsWith(dateKey);
+          } else if (typeof d === 'object' && d.date) {
+            return d.date.startsWith(dateKey);
+          } else if (d instanceof Date) {
+            return d.toISOString().split('T')[0] === dateKey;
+          }
+          return false;
+        });
+
+        // Verifica se a tarefa ainda está pendente (em list_dates)
+        const isPendingOnDate = task.list_dates.some(d => {
+          if (typeof d === 'string') {
+            return d.startsWith(dateKey);
+          } else if (typeof d === 'object' && d.date) {
+            return d.date.startsWith(dateKey);
+          } else if (d instanceof Date) {
+            return d.toISOString().split('T')[0] === dateKey;
+          }
+          return false;
+        });
+
+        if (isCompletedOnDate) {
+          completedTasks++;
+        } else if (taskHasFailed && isPendingOnDate) {
+          failedTasks++;
+        } else if (isPendingOnDate) {
+          incompleteTasks++;
         }
       });
       
       days.push({
         date: currentDay,
-        isPast,
-        isToday,
+        isPast: isPastDay,
+        isToday: isToday,
         incompleteTasks,
         completedTasks,
         failedTasks,

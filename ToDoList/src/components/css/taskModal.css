@@ -209,24 +209,39 @@
   background: #f44336;
   color: #fff;
 }
+/* Botões de ação (editar e deletar) na tabela de tarefas */
 .edit-task-btn, .delete-task-btn {
   background: none;
   border: none;
-  color: #bfc0c0;
-  font-size: 1.3rem;
+  color: #888;
   cursor: pointer;
-  padding: 2px 4px;
+  padding: 4px;
   border-radius: 4px;
-  transition: background 0.2s, color 0.2s;
-  display: inline-flex;
+  transition: all 0.2s;
+  display: inline-flex; /* Garante que os botões fiquem lado a lado */
   align-items: center;
+  justify-content: center;
+  margin: 0 2px; /* Pequeno espaçamento entre os botões */
 }
+
+/* Hover effect para o botão de editar */
 .edit-task-btn:hover {
+  background: #333;
   color: #4a5a6a;
 }
+
+/* Hover effect para o botão de deletar (cor vermelha para indicar ação perigosa) */
 .delete-task-btn:hover {
-  color: #ff5252;
+  background: #d32f2f20;
+  color: #d32f2f;
 }
+
+/* Garantir que a coluna de ações tenha espaço suficiente para os dois botões */
+.tasks-table td:last-child {
+  white-space: nowrap; /* Evita quebra de linha */
+  min-width: 80px; /* Largura mínima para acomodar os botões */
+}
+
 @media (max-width: 900px) {
   .tasks-table th, .tasks-table td {
     padding: 7px 4px;
@@ -234,6 +249,18 @@
   }
   .tasklist-title, .tasklist-desc {
     max-width: 120px;
+  }
+  /* Ajustes para botões em telas médias */
+  .edit-task-btn, .delete-task-btn {
+    font-size: 1.2rem;
+    padding: 2px 4px;
+    margin: 0 1px; /* Reduz o espaçamento em telas menores */
+    display: inline-flex;
+  }
+  /* Garantir espaço mínimo para os botões em telas médias */
+  .tasks-table td:last-child {
+    white-space: nowrap;
+    min-width: 70px;
   }
 }
 @media (max-width: 700px) {
@@ -295,6 +322,7 @@
     font-size: 1rem;
     padding: 5px 14px;
   }
+  /* Ajustes para botões em telas pequenas */
   .edit-task-btn, .delete-task-btn {
     font-size: 1.3rem;
     padding: 6px 10px;
@@ -304,13 +332,16 @@
     width: 38px;
     height: 38px;
     justify-content: center;
+    display: inline-flex;
   }
+  /* Layout flexível para a coluna de ações em telas pequenas */
   .tasks-table td:last-child {
     display: flex;
     gap: 10px;
     justify-content: flex-start;
     align-items: center;
     margin-top: 8px;
+    flex-wrap: nowrap; /* Garante que os botões não quebrem linha */
   }
   .tasks-table td {
     position: relative;
@@ -521,13 +552,19 @@
 }
 
 .selected-dates {
+  margin-top: 12px;
+}
+
+.selected-dates-list {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
   margin-top: 8px;
-  max-height: 100px;
+  padding: 8px;
+  background: #232526;
+  border-radius: 8px;
+  max-height: 120px;
   overflow-y: auto;
-  padding: 5px 0 0 0;
 }
 
 .date-tag {
@@ -536,11 +573,40 @@
   gap: 6px;
   background: #353535;
   color: #e0e0e0;
-  padding: 6px 14px;
+  padding: 6px 12px;
   border-radius: 6px;
   font-size: 14px;
-  font-weight: 600;
-  box-shadow: 0 1px 4px 0 #22222220;
+  font-weight: 500;
+}
+
+.remove-date {
+  background: none;
+  border: none;
+  color: #888;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  transition: all 0.2s;
+}
+
+.remove-date:hover {
+  color: #fff;
+  background: #444;
+}
+
+.react-datepicker__day--highlighted {
+  background-color: #216ba5 !important;
+  color: white !important;
+}
+
+.react-datepicker__day--highlighted:hover {
+  background-color: #1d5d8c !important;
 }
 
 /* Estilos do DatePicker */
@@ -773,4 +839,36 @@
   margin: 0;
   width: 100%;
   display: block;
+}
+
+.error-message {
+  color: #dc3545;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  border-radius: 4px;
+  padding: 10px;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+/* Estilos para radio buttons no modal de exclusão */
+.modal-body input[type="radio"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #4a5a6a; /* Cor personalizada para o radio button */
+  cursor: pointer;
+}
+
+/* Estilos para labels dos radio buttons */
+.modal-body label {
+  cursor: pointer;
+  color: #bfc0c0;
+  font-size: 15px;
+  font-weight: 500;
+  transition: color 0.2s; /* Transição suave no hover */
+}
+
+/* Hover effect para os labels */
+.modal-body label:hover {
+  color: #fff;
 } 

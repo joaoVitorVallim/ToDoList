@@ -2,22 +2,31 @@
   background-color: #1e1e1e;
   border-radius: 8px;
   padding: 20px;
-  margin: 20px;
+  margin: 20px auto;
   box-shadow: 0 0 10px rgba(0,0,0,0.5);
   max-width: 700px;
-  margin-left: auto;
-  margin-right: auto;
 }
 
-.calendar-header {
+.calendar-header-flex {
   text-align: center;
   margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-.calendar-header h2 {
+.calendar-header-flex h2 {
   color: #fff;
   margin: 0;
   font-size: 1.5rem;
+}
+
+.calendar-nav-btn {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 1.5rem;
+  cursor: pointer;
 }
 
 .calendar-grid {
@@ -30,7 +39,7 @@
   text-align: center;
   color: #888;
   font-weight: bold;
-  padding: 10px;
+  padding: 10px 0;
   font-size: 1rem;
 }
 
@@ -41,7 +50,7 @@
   padding: 8px;
   position: relative;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: background-color 0.2s, border 0.2s;
   font-size: 1rem;
 }
 
@@ -55,7 +64,7 @@
 }
 
 .calendar-day.past {
-  opacity: 0.5;
+  opacity: 0.6;
 }
 
 .calendar-day.today {
@@ -72,181 +81,81 @@
 
 .task-counts {
   position: absolute;
+  bottom: 8px;
   left: 0;
   right: 0;
-  bottom: 2px;
   display: flex;
-  flex-direction: row;
   justify-content: center;
-  gap: 2px;
-  z-index: 2;
+  gap: 5px;
 }
 
 .task-count {
-  font-size: 11px;
-  padding: 2px 4px;
-  border-radius: 4px;
-  text-align: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
   color: white;
-}
-
-.task-count.incomplete {
-  background-color: #f44336;
-}
-
-.task-count.complete {
-  background-color: #4a5a6a;
-}
-
-.task-count.failed {
-  background-color: #ff9800;
-  color: #000;
-}
-
-.task-count.incomplete-circle,
-.task-count.complete-circle,
-.task-count.failed-circle {
-  width: 15px;
-  height: 15px;
-  font-size: 0.7em;
-  margin-bottom: 0;
-  margin-right: 0;
-  box-shadow: 0 1px 2px #0002;
+  font-size: 12px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.2);
 }
 
 .task-count.incomplete-circle {
   background-color: #f44336;
-  color: #fff;
 }
 
 .task-count.complete-circle {
   background-color: #4caf50;
-  color: #fff;
 }
 
 .task-count.failed-circle {
   background-color: #ff9800;
-  color: #fff;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 768px) {
   .calendar-container {
-    padding: 12px;
-    margin: 8px;
-    max-width: 100vw;
+    padding: 15px;
+    margin: 15px;
   }
   .calendar-grid {
     gap: 8px;
-  }
-  .calendar-day {
-    padding: 8px;
-    font-size: 1rem;
-  }
-  .task-count {
-    font-size: 0.85rem;
-    padding: 2px 4px;
   }
 }
 
 @media (max-width: 600px) {
   .calendar-container {
-    padding: 2px;
-    margin: 0;
-    max-width: 100vw;
-    min-width: 0;
-  }
-  .calendar-header h2 {
-    font-size: 1rem;
-    padding: 0 2px;
-  }
-  .calendar-header-flex {
-    gap: 6px;
-  }
-  .calendar-nav-btn {
-    font-size: 1.2rem;
-    padding: 0 4px;
+    padding: 10px;
+    margin: 10px 0;
   }
   .calendar-grid {
-    gap: 1px;
+    gap: 5px;
   }
+  .calendar-header-flex h2 {
+    font-size: 1.2rem;
+  }
+  .weekday, .day-number {
+    font-size: 0.8rem;
+  }
+  .task-count {
+    width: 8px;
+    height: 8px;
+  }
+}
+
+@media (max-width: 400px) {
   .calendar-day {
-    padding: 1px;
-    font-size: 0.7rem;
-    min-width: 24px;
-    min-height: 24px;
-  }
-  .weekday {
-    font-size: 0.7rem;
-    padding: 2px;
+    padding: 4px;
   }
   .day-number {
-    top: 2px;
-    left: 2px;
     font-size: 0.7rem;
   }
   .task-counts {
-    bottom: 1px;
-    gap: 1px;
+    gap: 3px;
   }
   .task-count {
-    font-size: 0.65rem;
-    padding: 1px 2px;
-    border-radius: 3px;
-    white-space: nowrap;
-    max-width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    text-align: center;
+    width: 6px;
+    height: 6px;
   }
-  .task-count.incomplete::after {
-    content: ' pend.';
-    font-size: 0.65rem;
-    display: inline;
-  }
-  .task-count.incomplete {
-    /* Esconde o texto original 'pendente(s)' no mobile */
-  }
-  .task-count.incomplete {
-    /* Remove texto extra se houver */
-  }
-  .task-count.complete::after {
-    content: ' conc.';
-    font-size: 0.65rem;
-    display: inline;
-  }
-  .task-count.failed::after {
-    content: ' falh.';
-    font-size: 0.65rem;
-    display: inline;
-  }
-  .task-count.incomplete-circle,
-  .task-count.complete-circle,
-  .task-count.failed-circle {
-    width: 12px;
-    height: 12px;
-    font-size: 0.6em;
-    margin-bottom: 0;
-    margin-right: 0;
-  }
-}
-
-.calendar-header-flex {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-}
-
-.calendar-nav-btn {
-  background: none;
-  border: none;
-  color: #fff;
-  font-size: 1.5rem;
-  cursor: pointer;
-  padding: 0 8px;
-  transition: color 0.2s;
-}
-
-.calendar-nav-btn:hover {
-  color: #4a5a6a;
 } 
