@@ -5,10 +5,12 @@ import Calendar from "../components/Calendar.jsx";
 import TaskModal from "../components/TaskModal.jsx";
 import TasksList from "../components/TasksList";
 import "./css/tarefas.css";
+import { useNotification } from "../context/NotificationContext.jsx";
 
 const URL_BASE = import.meta.env.VITE_URL_BASE;
 
 export default function Tarefas() {
+  const { addNotification } = useNotification();
   // Estados para controlar a interface
   const [tasks, setTasks] = useState([]); // Lista de todas as tarefas do usuário
   const [showAddTask, setShowAddTask] = useState(false); // Controla exibição do modal de adicionar tarefa
@@ -51,6 +53,7 @@ export default function Tarefas() {
   const handleTaskCreated = (newTask) => {
     setTasks(prevTasks => [...prevTasks, newTask]);
     fetchTasks(); // Re-busca as tarefas para garantir consistência
+    addNotification("Tarefa criada com sucesso!", "success");
   };
 
   /**
@@ -114,8 +117,11 @@ export default function Tarefas() {
         });
       });
 
+      addNotification("Status da tarefa alterado.", "info");
+
     } catch (error) {
       console.error("Erro ao atualizar status da tarefa:", error.response ? error.response.data : error.message);
+      addNotification("Erro ao alterar status da tarefa.", "error");
     }
   };
 
@@ -143,6 +149,7 @@ export default function Tarefas() {
     setShowEditModal(false);
     setEditingTask(null);
     fetchTasks(); // Opcional, para garantir consistência
+    addNotification("Tarefa atualizada com sucesso!", "success");
   };
 
   /**
@@ -172,6 +179,7 @@ export default function Tarefas() {
 
         // Atualizar o estado local removendo a tarefa completamente
         setTasks(prevTasks => prevTasks.filter(t => t._id !== taskToDelete._id));
+        addNotification("Tarefa excluída permanentemente.", "error");
       } else {
         // Remover apenas a data selecionada da tarefa
         const dateString = selectedDate.toISOString().split('T')[0];
@@ -224,6 +232,7 @@ export default function Tarefas() {
             { headers: { 'Authorization': `Bearer ${token}` } }
           );
           setTasks(updatedTasks.filter(t => t._id !== taskToDelete._id));
+          addNotification("Tarefa excluída permanentemente.", "error");
         } else {
           // Atualiza a tarefa no backend com as novas datas
           await axios.put(
@@ -235,6 +244,7 @@ export default function Tarefas() {
             { headers: { 'Authorization': `Bearer ${token}` } }
           );
           setTasks(updatedTasks);
+          addNotification("Data removida da tarefa.", "info");
         }
       }
       
@@ -246,6 +256,7 @@ export default function Tarefas() {
       
     } catch (error) {
       console.error("Erro ao excluir tarefa:", error.response ? error.response.data : error.message);
+      addNotification("Erro ao excluir tarefa.", "error");
     }
   };
 
