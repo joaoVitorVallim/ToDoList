@@ -2,8 +2,10 @@ import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import './css/login.css';
 import { URL_BASE_BACKEND } from '../config';
+import { useNotification } from "../context/NotificationContext.jsx";
 
 export default function CodigoRecuperacao() {
+  const { addNotification } = useNotification();
   const location = useLocation();
   const email = location.state?.email;
   const [codigo, setCodigo] = useState('');
@@ -22,16 +24,16 @@ export default function CodigoRecuperacao() {
     });
     const data = await response.json();
     if (response.ok) {
-      alert(data.message || "Código verificado com sucesso!");
+      addNotification("Código verificado com sucesso!", "success");
       navigate('/nova-senha', { state: { email, codigo } });
     } else {
-      alert(data.message || "Código inválido ou expirado");
+      addNotification("Código inválido ou expirado", "error");
       navigate('/codigo-recuperacao', { state: { email } });
     }
   }
   catch (error) {
     console.error("Erro:", error);
-    alert("Erro ao conectar com o servidor");
+    addNotification("Erro ao conectar com o servidor", "error");
     navigate('/codigo-recuperacao', { state: { email } });
   }
   setCodigo('');

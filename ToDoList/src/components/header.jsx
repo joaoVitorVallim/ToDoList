@@ -39,7 +39,7 @@ export default function Header() {
       );
       setNotificationsEnabled((prev) => !prev);
     } catch (err) {
-      alert("Erro ao atualizar notificações");
+      addNotification("Erro ao atualizar notificações", "error");
     }
   };
 

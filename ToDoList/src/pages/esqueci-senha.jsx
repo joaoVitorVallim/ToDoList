@@ -2,8 +2,10 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './css/login.css';
 import { URL_BASE_BACKEND } from '../config';
+import { useNotification } from "../context/NotificationContext.jsx";
 
 export default function EsqueciSenha() {
+  const { addNotification } = useNotification();
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false); 
   const navigate = useNavigate();
@@ -25,12 +27,12 @@ export default function EsqueciSenha() {
         if (response.ok) {
           navigate('/codigo-recuperacao', {state: { email }});
         } else {
-          alert(data.message || "Erro ao enviar código de recuperação");
+          addNotification("Erro ao enviar código de recuperação", "error");
           navigate('/esqueci-senha');
         }
       } catch (error) {
         console.error("Erro:", error);
-        alert("Erro ao conectar com o servidor");
+        addNotification("Erro ao conectar com o servidor", "error");
         navigate('/esqueci-senha');
       } finally {
         setLoading(false); 

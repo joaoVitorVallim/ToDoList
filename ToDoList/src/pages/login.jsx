@@ -2,8 +2,10 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./css/login.css";
 import { URL_BASE_BACKEND } from "../config";
+import { useNotification } from "../context/NotificationContext.jsx";
 
 export default function Login() {
+  const { addNotification } = useNotification();
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
 
@@ -24,14 +26,14 @@ export default function Login() {
 
        if (response.ok) {
         localStorage.setItem("token", data.token);
-        alert("Login realizado com sucesso!");
+        addNotification("Login realizado com sucesso!", "success");
         navigate("/tarefas");
       } else {
-        alert(data.message || "Erro ao fazer login");
+        addNotification(data.message, "error");
         navigate("/");
       }
     } catch (error) {
-      alert(data.message || 'Erro no login');
+      addNotification(data.message, "error");
       navigate("/");
     }
   };
@@ -46,7 +48,7 @@ export default function Login() {
         <button
           className="button google-button"
           type="button"
-          onClick={() => alert('Funcionalidade de login com Google ainda não implementada!')}
+          onClick={() => addNotification('Funcionalidade de login com Google ainda não implementada!', "error")}
         >
           <img
             src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
