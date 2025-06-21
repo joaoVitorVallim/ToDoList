@@ -140,13 +140,13 @@ const forgotPassword = async (req, res) => {
         to: email,
         subject: 'Código de Recuperação de Senha',
         html: `
-          <body style="background: #f4f4f4; padding: 0; margin: 0;">
+          <body style="background-color:#f4f4f4; color:#333; padding:0; margin:0;">
             <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 480px; margin: 40px auto; background: #fff; border-radius: 12px; box-shadow: 0 4px 24px rgba(0,0,0,0.08); padding: 32px 28px; border: 1px solid #e0e0e0;">
               <h2 style="color: #2e7d32; margin-top: 0; margin-bottom: 18px; font-weight: 700; font-size: 1.6rem; letter-spacing: 1px;">Recuperação de Senha</h2>
               <p style="color: #333; font-size: 1.05rem; margin-bottom: 18px;">Olá <strong>${user.name}</strong>,</p>
               <p style="color: #444; margin-bottom: 18px;">Você solicitou a recuperação da sua senha. Utilize o código abaixo para prosseguir:</p>
               <div style="text-align: center; margin: 18px 0 28px 0;">
-                <span style="display: inline-block; background: linear-gradient(90deg, #43e97b 0%, #38f9d7 100%); color: #fff; padding: 16px 32px; border-radius: 8px; font-size: 1.25rem; font-weight: bold; letter-spacing: 2px; box-shadow: 0 2px 8px rgba(67,233,123,0.10);">
+                <span style="display: inline-block; background: linear-gradient(90deg, #43e97b 0%, #38f9d7 100%); color: #222; padding: 16px 32px; border-radius: 8px; font-size: 1.25rem; font-weight: bold; letter-spacing: 2px; box-shadow: 0 2px 8px rgba(67,233,123,0.10);">
                   ${code}
                 </span>
               </div>
@@ -167,7 +167,7 @@ const forgotPassword = async (req, res) => {
 
 const resetPassword = async (req, res) => {
     const { email, code, newPass } = req.body;
-
+    console.log(email, code, newPass);
     const user = await User.findOne({ email });
       if (!user) {
           return res.status(404).json({ message: 'Usuário não encontrado' });
@@ -182,7 +182,7 @@ const resetPassword = async (req, res) => {
       }
 
     const hashedPassword = await bcrypt.hash(newPass, 10);
-    user.password = hashedPassword;
+    user.passwordHash = hashedPassword;
 
     user.resetCode = undefined;
     user.resetCodeExpires = undefined;
