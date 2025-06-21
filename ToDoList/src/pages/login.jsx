@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./css/login.css";
+import { URL_BASE_BACKEND } from "../config";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -8,13 +9,30 @@ export default function Login() {
 
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
+    try {
+      const response = await fetch(`${URL_BASE_BACKEND}/user/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password: senha }),
+      });
 
-    if (email === "teste@teste.com" && senha === "123") {
-      navigate("/tarefas");
-    } else {
-      alert("Email ou senha inválidos");
+      const data = await response.json();
+
+       if (response.ok) {
+        localStorage.setItem("token", data.token);
+        alert("Login realizado com sucesso!");
+        navigate("/tarefas");
+      } else {
+        alert(data.message || "Erro ao fazer login");
+        navigate("/");
+      }
+    } catch (error) {
+      alert(data.message || 'Erro no login');
+      navigate("/");
     }
   };
 

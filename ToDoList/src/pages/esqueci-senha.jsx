@@ -1,15 +1,41 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './css/login.css';
+import { URL_BASE_BACKEND } from '../config';
 
 export default function EsqueciSenha() {
   const [email, setEmail] = useState('');
+  const [loading, setLoading] = useState(false); 
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Aqui você enviaria o email para o backend
-    navigate('/codigo-recuperacao');
+    setLoading(true); 
+    try {
+      const response = await fetch(`${URL_BASE_BACKEND}/user/forgot-password`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await response.json();
+
+        if (response.ok) {
+          navigate('/codigo-recuperacao', {state: { email }});
+        } else {
+          alert(data.message || "Erro ao enviar código de recuperação");
+          navigate('/esqueci-senha');
+        }
+      } catch (error) {
+        console.error("Erro:", error);
+        alert("Erro ao conectar com o servidor");
+        navigate('/esqueci-senha');
+      } finally {
+        setLoading(false); 
+      }
+    
   };
 
   return (
@@ -25,8 +51,11 @@ export default function EsqueciSenha() {
             value={email}
             onChange={e => setEmail(e.target.value)}
             required
+            disabled={loading}
           />
-          <button className="button" type="submit">Enviar código</button>
+          <button className="button" type="submit">
+          {loading ? 'Enviando código para o Email...' : 'Enviar código'}
+          </button>
         </form>
       </div>
     </div>

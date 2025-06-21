@@ -1,15 +1,40 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import './css/login.css';
+import { URL_BASE_BACKEND } from '../config';
 
 export default function CodigoRecuperacao() {
+  const location = useLocation();
+  const email = location.state?.email;
   const [codigo, setCodigo] = useState('');
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Aqui você validaria o código no backend
-    navigate('/nova-senha');
+    
+  try {
+    const response = await fetch(`${URL_BASE_BACKEND}/user/reset-verify`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email, code: codigo }),
+    });
+    const data = await response.json();
+    if (response.ok) {
+      alert(data.message || "Código verificado com sucesso!");
+      navigate('/nova-senha', { state: { email, codigo } });
+    } else {
+      alert(data.message || "Código inválido ou expirado");
+      navigate('/codigo-recuperacao', { state: { email } });
+    }
+  }
+  catch (error) {
+    console.error("Erro:", error);
+    alert("Erro ao conectar com o servidor");
+    navigate('/codigo-recuperacao', { state: { email } });
+  }
+  setCodigo('');
   };
 
   return (
