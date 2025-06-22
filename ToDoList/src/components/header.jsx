@@ -68,9 +68,12 @@ export default function Header() {
             <span className="notif-badge" />
           </button>
         )}
-        <Link to="/" className="logout">
+        <button className="logout" onClick={() => {
+          localStorage.clear();
+          window.location.href = '/';
+        }}>
           Logout
-        </Link>
+        </button>
       </div>
     </header>
   );

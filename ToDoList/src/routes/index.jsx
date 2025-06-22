@@ -6,6 +6,7 @@ import EsqueciSenha from "../pages/esqueci-senha.jsx";
 import CodigoRecuperacao from "../pages/codigo-recuperacao.jsx";
 import NovaSenha from "../pages/nova-senha.jsx";
 import Cadastro from "../pages/cadastro.jsx";
+import AuthCallback from "../pages/authCallback.jsx";
 
 export default function AppRoutes() {
   return (
@@ -18,6 +19,7 @@ export default function AppRoutes() {
         <Route path="/codigo-recuperacao" element={<CodigoRecuperacao />} />
         <Route path="/nova-senha" element={<NovaSenha />} />
         <Route path="/cadastro" element={<Cadastro />} />
+        <Route path="/auth/callback" element={<AuthCallback />} />
       </Routes>
     </BrowserRouter>
   );

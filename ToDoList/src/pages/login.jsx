@@ -11,6 +11,10 @@ export default function Login() {
 
   const navigate = useNavigate();
 
+  const loginGoogle = () => {
+    window.location.href = `${URL_BASE_BACKEND}/auth/google`;
+  };
+
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
@@ -48,7 +52,7 @@ export default function Login() {
         <button
           className="button google-button"
           type="button"
-          onClick={() => addNotification('Funcionalidade de login com Google ainda não implementada!', "error")}
+          onClick={ () => loginGoogle() }
         >
           <img
             src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
