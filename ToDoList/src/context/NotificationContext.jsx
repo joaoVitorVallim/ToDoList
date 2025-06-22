@@ -9,7 +9,7 @@ let idCounter = 0;
 export const NotificationProvider = ({ children }) => {
   const [notifications, setNotifications] = useState([]);
 
-  const addNotification = useCallback((message, type = 'success', duration = 1000) => {
+  const addNotification = useCallback((message, type = 'success', duration = 2000) => {
     const id = idCounter++;
     setNotifications((prev) => [...prev, { id, message, type, duration }]);
   }, []);
