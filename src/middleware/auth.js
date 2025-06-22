@@ -18,8 +18,8 @@ exports.isAuthenticated = async (req, res, next) => {
     // Verifica o token
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'sua_chave_secreta_jwt');
     
-    // Busca o usuário
-    const user = await User.findById(decoded.userId);
+    // Busca o usuário - corrigido para usar 'id' em vez de 'userId'
+    const user = await User.findById(decoded.id);
     
     if (!user) {
       return res.status(401).json({ message: 'Usuário não encontrado' });

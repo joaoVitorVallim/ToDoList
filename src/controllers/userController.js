@@ -67,7 +67,7 @@ const cadastro = async (req, res) => {
 
     // Gera o token JWT
     const token = jwt.sign(
-      { userId: user._id },
+      { id: user._id },
       process.env.JWT_SECRET || 'sua_chave_secreta_jwt',
       { expiresIn: '24h' }
     );
