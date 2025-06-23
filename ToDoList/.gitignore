@@ -8,8 +8,6 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
-dist
-dist-ssr
 *.local
 
 # Editor directories and files
@@ -25,9 +23,6 @@ dist-ssr
 
 # dependências
 node_modules/
-
-# build
-dist/
 
 # arquivos de log
 npm-debug.log*
