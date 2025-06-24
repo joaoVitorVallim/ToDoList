@@ -19,7 +19,7 @@ router.get('/google/callback',
   function(req, res) {
     // Autenticação bem-sucedida
       const token = generateToken(req.user._id);
-      res.redirect(`http://localhost:5173/auth/callback?token=${token}`);
+      res.redirect(`https://todolist-1-zbwl.onrender.com/auth/callback?token=${token}`);
     }
   );
 
