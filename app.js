@@ -17,12 +17,7 @@ const app = express();
 
 // Middleware
 app.use(express.json());
-app.use(cors({
-    origin: 'https://todolist-1-zbwl.onrender.com/',  // Atualize para a porta do seu frontend
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true  // Permite envio de cookies de sessão
-}));
+app.use(cors());
 
 // Configuração da sessão
 app.use(session({
