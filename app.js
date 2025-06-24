@@ -48,3 +48,38 @@ app.use('/tasks', taskRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`RODANDO SEUS BROXA !!`));
+
+
+app.get('/', (req, res) => {
+  res.send(`
+    <!DOCTYPE html>
+    <html lang="pt-br">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Backend</title>
+        <style>
+            body {
+                background-color: #121212;
+                color: white;
+                font-family: Arial, sans-serif;
+                text-align: center;
+                padding-top: 20%;
+            }
+            h1 {
+                font-size: 3em;
+                margin-bottom: 20px;
+            }
+            p {
+                color: #ccc;
+                font-size: 1.2em;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>🚀 Bem-vindo ao nosso Backend!</h1>
+        <p>API funcionando corretamente.</p>
+    </body>
+    </html>
+  `);
+});
