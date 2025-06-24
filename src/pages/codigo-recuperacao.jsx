@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import './css/login.css';
-import { URL_BASE_BACKEND } from '../config';
 import { useNotification } from "../context/NotificationContext.jsx";
+
+const URL_BASE = import.meta.env.VITE_URL_BASE;
 
 export default function CodigoRecuperacao() {
   const { addNotification } = useNotification();
@@ -15,7 +16,7 @@ export default function CodigoRecuperacao() {
     e.preventDefault();
     
   try {
-    const response = await fetch(`${URL_BASE_BACKEND}/user/reset-verify`, {
+    const response = await fetch(`${URL_BASE}/user/reset-verify`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

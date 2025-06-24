@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './css/login.css';
-import { URL_BASE_BACKEND } from '../config';
 import { useNotification } from "../context/NotificationContext.jsx";
+
+const URL_BASE = import.meta.env.VITE_URL_BASE;
 
 export default function EsqueciSenha() {
   const { addNotification } = useNotification();
@@ -14,7 +15,7 @@ export default function EsqueciSenha() {
     e.preventDefault();
     setLoading(true); 
     try {
-      const response = await fetch(`${URL_BASE_BACKEND}/user/forgot-password`, {
+      const response = await fetch(`${URL_BASE}/user/forgot-password`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

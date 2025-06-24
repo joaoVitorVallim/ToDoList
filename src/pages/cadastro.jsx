@@ -1,9 +1,10 @@
 import './css/login.css';
-import { URL_BASE_BACKEND } from "../config";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from 'axios';
 import { useNotification } from "../context/NotificationContext.jsx";
+
+const URL_BASE = import.meta.env.VITE_URL_BASE;
 
 export default function Cadastro() {
   const { addNotification } = useNotification();
@@ -29,7 +30,7 @@ export default function Cadastro() {
       };
 
       const response = await axios.post(
-        `${URL_BASE_BACKEND}/user/register`,
+        `${URL_BASE}/user/register`,
         registerData,
         {
           headers: { 'Content-Type': 'application/json' }

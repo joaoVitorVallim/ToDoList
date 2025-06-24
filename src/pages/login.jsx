@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./css/login.css";
-import { URL_BASE_BACKEND } from "../config";
 import { useNotification } from "../context/NotificationContext.jsx";
+
+const URL_BASE = import.meta.env.VITE_URL_BASE;
 
 export default function Login() {
   const { addNotification } = useNotification();
@@ -12,13 +13,13 @@ export default function Login() {
   const navigate = useNavigate();
 
   const loginGoogle = () => {
-    window.location.href = `${URL_BASE_BACKEND}/auth/google`;
+    window.location.href = `${URL_BASE}/auth/google`;
   };
 
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(`${URL_BASE_BACKEND}/user/login`, {
+      const response = await fetch(`${URL_BASE}/user/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
